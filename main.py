@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import messagebox
 
 window = Tk()
 window.title("Password Manager")
@@ -11,19 +12,34 @@ canvas.grid(column=1, row=0)
 
 
 def clear_input_fields():
-    website_input.delete(0,END)
-    password_input.delete(0,END)
+    website_input.delete(0, END)
+    password_input.delete(0, END)
     website_input.focus()
+
+
+def no_empty_check():
+    if website_input.get() == "" or email_input.get() == "" or password_input.get() == "":
+        messagebox.showwarning(message="Please don't leave any field empty!")
+        return False
+    return True
 
 
 def get_inputs():
     return f"{website_input.get()} | {email_input.get()} | {password_input.get()} \n"
 
 
+def inputs_are_ok():
+    return messagebox.askokcancel(title={website_input.get()},
+                                  message=f"These are the details entered: \nEmail: {email_input.get()} "
+                                          f"\nPassword: {password_input.get()} \n Is it ok to save?")
+
+
 def save_input():
-    with open("data.txt", mode="a") as file:
-        file.write(get_inputs())
-        clear_input_fields()
+    if no_empty_check():
+        if inputs_are_ok():
+            with open("data.txt", mode="a") as file:
+                file.write(get_inputs())
+                clear_input_fields()
 
 
 website_label = Label(text="Website: ")
