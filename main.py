@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 import random
 import pyperclip
+import json
 
 window = Tk()
 window.title("Password Manager")
@@ -14,7 +15,9 @@ canvas.grid(column=1, row=0)
 
 
 def generate_password():
-    letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+    letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
+               'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+               'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
     numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     symbols = ['!', '#', '$', '%', '&', '(', ')', '*', '+']
 
@@ -49,7 +52,14 @@ def no_empty_check():
 
 
 def get_inputs():
-    return f"{website_input.get()} | {email_input.get()} | {password_input.get()} \n"
+    data = {
+        website_input.get():
+            {
+                "email": email_input.get(),
+                "password": password_input.get()
+            }
+    }
+    return data
 
 
 def inputs_are_ok():
@@ -61,8 +71,19 @@ def inputs_are_ok():
 def save_input():
     if no_empty_check():
         if inputs_are_ok():
-            with open("data.txt", mode="a") as file:
-                file.write(get_inputs())
+            try:
+                with open("data.json", mode="r") as file:
+                    data = json.load(file)
+            except FileNotFoundError:
+                with open("data.json", mode="w") as file:
+                    json.dump(get_inputs(), file, indent=4)
+
+            else:
+                data.update(get_inputs())
+                with open("data.json", mode="w") as file:
+                    json.dump(data, file, indent=4)
+
+            finally:
                 clear_input_fields()
 
 
