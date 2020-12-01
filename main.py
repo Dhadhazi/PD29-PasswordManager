@@ -68,20 +68,31 @@ def inputs_are_ok():
                                           f"\nPassword: {password_input.get()} \n Is it ok to save?")
 
 
+def get_file_data(filename):
+    try:
+        with open(filename, mode="r") as file:
+            return json.load(file)
+    except FileNotFoundError:
+        raise FileNotFoundError("File not found")
+
+
+def write_file(filename, data):
+    with open(filename, mode="w") as file:
+        json.dump(data, file, indent=4)
+
+
 def save_input():
     if no_empty_check():
         if inputs_are_ok():
             try:
-                with open("data.json", mode="r") as file:
-                    data = json.load(file)
+                data = get_file_data("data.json")
+
             except FileNotFoundError:
-                with open("data.json", mode="w") as file:
-                    json.dump(get_inputs(), file, indent=4)
+                write_file(filename="data.json", data=get_inputs())
 
             else:
                 data.update(get_inputs())
-                with open("data.json", mode="w") as file:
-                    json.dump(data, file, indent=4)
+                write_file(filename="data.json", data=data)
 
             finally:
                 clear_input_fields()
