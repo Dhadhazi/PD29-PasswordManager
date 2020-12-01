@@ -4,6 +4,8 @@ import random
 import pyperclip
 import json
 
+FILENAME="data.json"
+
 window = Tk()
 window.title("Password Manager")
 window.config(padx=50, pady=50)
@@ -68,6 +70,19 @@ def inputs_are_ok():
                                           f"\nPassword: {password_input.get()} \n Is it ok to save?")
 
 
+def search_website():
+    data = get_file_data(FILENAME)
+    try:
+        site_info = data[website_input.get()]
+        email = site_info.get("email")
+        password = site_info.get("password")
+        message = f"Email: {email} \nPassword: {password}"
+    except KeyError:
+        message = "Site not found"
+    finally:
+        messagebox.showinfo(title=website_input.get(), message=message)
+
+
 def get_file_data(filename):
     try:
         with open(filename, mode="r") as file:
@@ -85,14 +100,14 @@ def save_input():
     if no_empty_check():
         if inputs_are_ok():
             try:
-                data = get_file_data("data.json")
+                data = get_file_data(FILENAME)
 
             except FileNotFoundError:
-                write_file(filename="data.json", data=get_inputs())
+                write_file(filename=FILENAME, data=get_inputs())
 
             else:
                 data.update(get_inputs())
-                write_file(filename="data.json", data=data)
+                write_file(filename=FILENAME, data=data)
 
             finally:
                 clear_input_fields()
@@ -105,13 +120,15 @@ email_label.grid(column=0, row=2)
 password_label = Label(text="Password: ")
 password_label.grid(column=0, row=3)
 
+search_button = Button(text="Search", command=search_website)
+search_button.grid(column=2, row=1)
 generate_button = Button(text="Generate Password", command=add_generated_password)
 generate_button.grid(column=2, row=3)
 add_button = Button(text="Add", width=36, command=save_input)
 add_button.grid(column=1, row=4, columnspan=2)
 
-website_input = Entry(width=35)
-website_input.grid(column=1, row=1, columnspan=2)
+website_input = Entry(width=21)
+website_input.grid(column=1, row=1)
 website_input.focus()
 email_input = Entry(width=35)
 email_input.grid(column=1, row=2, columnspan=2)
